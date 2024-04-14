@@ -2,30 +2,37 @@ use std::io;
 
 use serde::{Deserialize, Serialize};
 
-
-#[derive(Debug,Serialize, Deserialize)]
-struct EdsmInfo {
-    #[serde(rename = "camalCase")]
+#[derive(Debug, Serialize, Deserialize)]
+struct SystemInfo {
+    information: Information,
     name: String,
-    information: Vec<Info>,
+    #[serde(rename = "primaryStar")]
+    primary_star: PrimaryStar,
 }
-#[derive(Debug,Serialize, Deserialize)]
-struct Info {
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Information {
     allegiance: String,
-    government: String,
-    faction: String,
-    population: i64,
-    security: String,
     economy: String,
+    faction: String,
+    #[serde(rename = "factionState")]
+    faction_state: String,
+    government: String,
+    population: i64,
+    #[serde(rename = "reserve")]
+    reserve: Option<String>,
     #[serde(rename = "secondEconomy")]
     second_economy: String,
-    service: String,
-    #[serde(rename = "primaryStar")]
-    primary_star: String,
-    name: String,
-    #[serde(rename = "isScoopable")]
-    is_scoopable: bool
+    security: String,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+struct PrimaryStar {
+    #[serde(rename = "isScoopable")]
+    is_scoopable: bool,
+    name: String,
+}
+
 async fn fetch_data(param_value: &str) -> Result<(), reqwest::Error> {
     let url = "https://www.edsm.net/api-v1/system";
     
@@ -44,7 +51,8 @@ async fn fetch_data(param_value: &str) -> Result<(), reqwest::Error> {
         .await?;
 
 
-    println!("{:#?}", response);
+        let person: SystemInfo = serde_json::from_value(response).expect("Failed to deserialize JSON");
+    println!("{:#?}", person);
 
     Ok(())
 }
