@@ -2,6 +2,8 @@ use std::io;
 use serde::{Deserialize, Serialize};
 use maplit::hashmap;
 
+// the following structs are for parsing the json from the EDSM api. 
+
 #[derive(Debug, Serialize, Deserialize)]
 struct SystemInfo {
     information: Information,
@@ -36,11 +38,13 @@ struct PrimaryStar {
 async fn fetch_data(param_value: &str) -> Result<(), reqwest::Error> {
     let url = "https://www.edsm.net/api-v1/system";
     
-    let params = hashmap! {
+    let params = hashmap! { // values to be sent to the api to show certain information.
         "systemName" => param_value,
         "showInformation" => "1",
         "showPrimaryStar" => "1"
     };
+
+    /* the above code replaces the blelow */
     // = std::collections::HashMap::new();
     // params.insert("systemName", param_value);
     // params.insert("showInformation","1");
@@ -66,7 +70,9 @@ async fn main() -> Result<(), reqwest::Error> {
 
     println!("please enter the name of the system you want:");
 
-    let mut input: String = String::new();
+    // gets the name of the system that the person wants. 
+
+    let mut input: String = String::new(); 
         io::stdin()
         .read_line(&mut input)
         .expect("Failed to read line");
