@@ -1,6 +1,6 @@
 use std::io;
-
 use serde::{Deserialize, Serialize};
+use maplit::hashmap;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct SystemInfo {
@@ -36,11 +36,15 @@ struct PrimaryStar {
 async fn fetch_data(param_value: &str) -> Result<(), reqwest::Error> {
     let url = "https://www.edsm.net/api-v1/system";
     
-    let mut params = std::collections::HashMap::new();
-    params.insert("systemName", param_value);
-    params.insert("showInformation","1");
-    params.insert("showPrimaryStar","1");
-   
+    let params = hashmap! {
+        "systemName" => param_value,
+        "showInformation" => "1",
+        "showPrimaryStar" => "1"
+    };
+    // = std::collections::HashMap::new();
+    // params.insert("systemName", param_value);
+    // params.insert("showInformation","1");
+    // params.insert("showPrimaryStar","1");
 
     let response: serde_json::Value = reqwest::Client::new()
         .get(url)
