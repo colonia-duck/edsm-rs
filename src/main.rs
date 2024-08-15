@@ -1,85 +1,27 @@
+mod sphere_radius;
+mod system_info;
+
+use crate::sphere_radius::sphere_radius_request::system_name_sphere;
+use crate::system_info::system_information_request::system_name;
 use std::io;
-use serde::{Deserialize, Serialize};
-use maplit::hashmap;
-
-// the following structs are for parsing the json from the EDSM api. 
-
-#[derive(Debug, Serialize, Deserialize)]
-struct SystemInfo {
-    information: Information,
-    name: String,
-    #[serde(rename = "primaryStar")]
-    primary_star: PrimaryStar,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Information {
-    allegiance: String,
-    economy: String,
-    faction: String,
-    #[serde(rename = "factionState")]
-    faction_state: String,
-    government: String,
-    population: i64,
-    #[serde(rename = "reserve")]
-    reserve: Option<String>,
-    #[serde(rename = "secondEconomy")]
-    second_economy: String,
-    security: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct PrimaryStar {
-    #[serde(rename = "isScoopable")]
-    is_scoopable: bool,
-    name: String,
-}
-
-async fn fetch_data(param_value: &str) -> Result<(), reqwest::Error> {
-    let url = "https://www.edsm.net/api-v1/system";
-    
-    let params = hashmap! { // values to be sent to the api to show certain information.
-        "systemName" => param_value,
-        "showInformation" => "1",
-        "showPrimaryStar" => "1"
-    };
-
-    /* the above code replaces the blelow */
-    // = std::collections::HashMap::new();
-    // params.insert("systemName", param_value);
-    // params.insert("showInformation","1");
-    // params.insert("showPrimaryStar","1");
-
-    let response: serde_json::Value = reqwest::Client::new()
-        .get(url)
-        .query(&params)
-        .send()
-        .await?
-        .json()
-        .await?;
-
-
-        let person: SystemInfo = serde_json::from_value(response).expect("Failed to deserialize JSON");
-    println!("{:#?}", person);
-
-    Ok(())
-}
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
+    println!("enter (1)  for system information\nenter (2) for sphere radius search");
+    // gets the name of the system that the person wants.
 
-    println!("please enter the name of the system you want:");
-
-    // gets the name of the system that the person wants. 
-
-    let mut input: String = String::new(); 
-        io::stdin()
+    let mut input: String = String::new();
+    io::stdin()
         .read_line(&mut input)
         .expect("Failed to read line");
 
-    let param_value = input.trim();
+    let selection = input.trim();
 
-    fetch_data(param_value).await?;
-    
+    if selection == "1" {
+        system_name().await?;
+    } else {
+        system_name_sphere().await?;
+    }
+
     Ok(())
 }
